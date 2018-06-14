@@ -19,8 +19,8 @@
     </div>
 
     <div class="footbar">
-      <div class="flexbox"><router-link :to="{ name: '', params: {} }">资&nbsp;&nbsp;&nbsp;讯</router-link></div>
-      <div class="flexbox"><router-link :to="{ name: '', params: {} }">我&nbsp;&nbsp;&nbsp;的</router-link></div>
+      <div class="flexbox"><router-link :to="{ name: 'Order', params: {} }">资&nbsp;&nbsp;&nbsp;讯</router-link></div>
+      <div class="flexbox"><router-link :to="{ name: 'User', params: {} }">我&nbsp;&nbsp;&nbsp;的</router-link></div>
     </div>
   </div>
 </template>
