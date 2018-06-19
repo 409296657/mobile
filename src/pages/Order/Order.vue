@@ -3,9 +3,24 @@
     <Head title="标题"></Head>
     <div class="container">
       <div class="content">
-        <Calendar
-          v-on:choseDay="clickDay"
-          v-on:changeMonth="changeDate"></Calendar>
+        <Calendar v-on:choseDay="clickDay"></Calendar>
+        <ul class="list">
+          <li class="">
+            <div>早餐</div>
+            <div class="order" v-if="order" @click="order = !order">点餐</div>
+            <div class="cancel" v-else @click="order = !order">已点餐</div>
+          </li>
+          <li class="">
+            <div>午餐</div>
+            <div class="order" v-if="order" @click="order = !order">点餐</div>
+            <div class="cancel" v-else @click="order = !order">已点餐</div>
+          </li>
+          <li class="">
+            <div>晚餐</div>
+            <div class="order" v-if="order" @click="order = !order">点餐</div>
+            <div class="cancel" v-else @click="order = !order">已点餐</div>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
@@ -23,18 +38,30 @@ export default {
   },
   data(){
     return{
-
+      data:'',
+      order:true,
     }
   },
   methods:{
     clickDay(data) {
       console.log(data); //选中某天
+      this.data = data;
     },
-    changeDate(data) {
-      console.log(data); //左右点击切换月份
-    },
-    clickToday(data) {
-      console.log(data); //跳到了本月
+    init(){
+      this.axios({
+        method:"POST",
+        url:"http://www.sanliwucun.cn:8089/jxlw/getDcxtResolver.r",
+        data:{
+          userid:"damin",
+          oraT:this.data,
+        }
+      })
+      .then((res)=>{
+        console.log(res)
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
     }
   },
   mounted(){
@@ -93,6 +120,34 @@ export default {
                    color: #bfbfbf;
                }
             }
+          }
+        }
+      }
+      .list{
+        margin-top: 50px;
+        li{
+          height: 50px;
+          font-size: 18px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-right: 15px;
+          border-bottom: 1px solid #bdbdbd;
+          div{
+            width: 70px;
+            text-align: center;
+            line-height: 26px;
+            height: 26px;
+          }
+          .order{
+            background-color: #26a2ff;
+            border-radius: 13px;
+            color: #fff;
+          }
+          .cancel{
+            background-color: #bdbdbd;
+            border-radius: 13px;
+            color: #fff;
           }
         }
       }
