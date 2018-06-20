@@ -6,19 +6,19 @@
         <Calendar v-on:choseDay="clickDay"></Calendar>
         <ul class="list">
           <li class="">
-            <div>早餐</div>
-            <div class="order" v-if="order" @click="order = !order">点餐</div>
-            <div class="cancel" v-else @click="order = !order">已点餐</div>
+            <div>早餐{{breakfast}}</div>
+            <div class="order" v-if="breakfast==1" @click="breakfast = 0">点餐</div>
+            <div class="cancel" v-else @click="breakfast = 1">已点餐</div>
           </li>
           <li class="">
-            <div>午餐</div>
-            <div class="order" v-if="order" @click="order = !order">点餐</div>
-            <div class="cancel" v-else @click="order = !order">已点餐</div>
+            <div>午餐{{lunch}}</div>
+            <div class="order" v-if="lunch==1" @click="lunch = 0">点餐</div>
+            <div class="cancel" v-else @click="lunch = 1">已点餐</div>
           </li>
           <li class="">
-            <div>晚餐</div>
-            <div class="order" v-if="order" @click="order = !order">点餐</div>
-            <div class="cancel" v-else @click="order = !order">已点餐</div>
+            <div>晚餐{{dinner}}</div>
+            <div class="order" v-if="dinner==1" @click="dinner = 0">点餐</div>
+            <div class="cancel" v-else @click="dinner = 1">已点餐</div>
           </li>
         </ul>
       </div>
@@ -39,21 +39,27 @@ export default {
   data(){
     return{
       data:'',
-      order:true,
+      breakfast:1,
+      lunch:1,
+      dinner:1,
     }
   },
   methods:{
     clickDay(data) {
       console.log(data); //选中某天
       this.data = data;
+      this.init()
     },
     init(){
       this.axios({
         method:"POST",
-        url:"http://www.sanliwucun.cn:8089/jxlw/getDcxtResolver.r",
+        url:"/api/jxlw/saveDcxtResolver.r",
         data:{
-          userid:"damin",
+          sjid:'',
+          userid:"admin",
           oraT:this.data,
+          valStatu:'1',
+          meal:'1'
         }
       })
       .then((res)=>{
@@ -65,7 +71,20 @@ export default {
     }
   },
   mounted(){
-
+    this.axios({
+      method:"POST",
+      url:'/api/jxlw/getDcxtResolver.r',
+      data:{
+        userid:"admin",
+        oraT:'2018-6-17',
+      }
+    })
+    .then((res)=>{
+      console.log(res)
+    })
+    .catch((err)=>{
+      console.log(err)
+    })
   }
 
 }
