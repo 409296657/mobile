@@ -7,18 +7,18 @@
         <ul class="list">
           <li class="">
             <div>早餐{{breakfast}}</div>
-            <div class="order" v-if="breakfast==1" @click="breakfast = 0">点餐</div>
-            <div class="cancel" v-else @click="breakfast = 1">已点餐</div>
+            <div class="order" v-if="breakfast==0" @click="saveBreakfast" :class="{prevent:click==1}">点餐</div>
+            <div class="cancel" v-else @click="breakfast = 0">已点餐</div>
           </li>
           <li class="">
             <div>午餐{{lunch}}</div>
-            <div class="order" v-if="lunch==1" @click="lunch = 0">点餐</div>
-            <div class="cancel" v-else @click="lunch = 1">已点餐</div>
+            <div class="order" v-if="lunch==0" @click="saveLunch" :class="{prevent:click==1}">点餐</div>
+            <div class="cancel" v-else @click="lunch = 0">已点餐</div>
           </li>
           <li class="">
             <div>晚餐{{dinner}}</div>
-            <div class="order" v-if="dinner==1" @click="dinner = 0">点餐</div>
-            <div class="cancel" v-else @click="dinner = 1">已点餐</div>
+            <div class="order" v-if="dinner==0" @click="saveDinner" :class="{prevent:click==1}">点餐</div>
+            <div class="cancel" v-else @click="dinner = 0">已点餐</div>
           </li>
         </ul>
       </div>
@@ -39,31 +39,103 @@ export default {
   data(){
     return{
       data:'',
-      breakfast:1,
-      lunch:1,
-      dinner:1,
+      breakfast:0,
+      lunch:0,
+      dinner:0,
+      click:0,
     }
   },
   methods:{
     clickDay(data) {
-      console.log(data); //选中某天
-      this.data = data;
-      this.init()
+      this.breakfast = 0;
+      this.lunch = 0;
+      this.dinner = 0;
+      let dd = this.util.setDate(data) //选中某天
+      this.data = dd;
+      this.getDcxtResolver()
     },
-    init(){
+    saveBreakfast(){
+      this.click = 1 ;
       this.axios({
         method:"POST",
-        url:"/api/jxlw/saveDcxtResolver.r",
-        data:{
-          sjid:'',
+        url:"/api/saveDcxtResolver.r",
+        params:{
+          sjid:"",
           userid:"admin",
           oraT:this.data,
-          valStatu:'1',
+          valStatu:'0',
           meal:'1'
         }
       })
       .then((res)=>{
-        console.log(res)
+        this.breakfast = 1
+        this.click = 0 ;
+      })
+      .catch((err)=>{
+        // console.log(err)
+      })
+    },
+    saveLunch(){
+      this.axios({
+        method:"POST",
+        url:"/api/saveDcxtResolver.r",
+        params:{
+          sjid:"",
+          userid:"admin",
+          oraT:this.data,
+          valStatu:'0',
+          meal:'2'
+        }
+      })
+      .then((res)=>{
+        this.lunch = 1
+      })
+      .catch((err)=>{
+        // console.log(err)
+      })
+    },
+    saveDinner(){
+      this.axios({
+        method:"POST",
+        url:"/api/saveDcxtResolver.r",
+        params:{
+          sjid:"",
+          userid:"admin",
+          oraT:this.data,
+          valStatu:'0',
+          meal:'3'
+        }
+      })
+      .then((res)=>{
+        this.dinner = 1
+      })
+      .catch((err)=>{
+        // console.log(err)
+      })
+    },
+    getDcxtResolver(date){
+      this.axios({
+        method:"POST",
+        url:'/api/getDcxtResolver.r',
+        params:{
+          userid:"admin",
+          oraT:this.data,
+        }
+      })
+      .then((res)=>{
+        let data = res.data.dataList;
+        console.log(data)
+        if(data.length!==0){
+          for (var i = 0; i < data.length; i++) {
+            if (data[i].orderingType==1) {
+              this.breakfast=1
+            }else if (data[i].orderingType==2) {
+              this.lunch=1
+            }else if (data[i].orderingType==3) {
+              this.dinner=1
+            }
+          }
+        }
       })
       .catch((err)=>{
         console.log(err)
@@ -71,19 +143,35 @@ export default {
     }
   },
   mounted(){
+    let newDate = new Date(),
+        today = newDate.toLocaleDateString();
+    let dd = this.util.setDate(today)
+    console.log(dd)
+    this.data = today;
     this.axios({
       method:"POST",
-      url:'/api/jxlw/getDcxtResolver.r',
-      data:{
-        userid:"admin",
-        oraT:'2018-6-17',
-      }
+      url:'/api/getDcxtResolver.r',
+      params:{
+        "userid":"admin",
+        "oraT":"2018-06-20",
+      },
     })
     .then((res)=>{
-      console.log(res)
+      let data = res.data.dataList;
+      if(data.length!==0){
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].orderingType==1) {
+            this.breakfast=1
+          }else if (data[i].orderingType==2) {
+            this.lunch=1
+          }else if (data[i].orderingType==3) {
+            this.dinner=1
+          }
+        }
+      }
     })
     .catch((err)=>{
-      console.log(err)
+
     })
   }
 
@@ -93,6 +181,9 @@ export default {
 <style lang="less">
 #Order{
   height: 100%;
+  .prevent{
+    pointer-events: none;
+  }
   .container{
     padding-top: 49px;
     height: 100%;
